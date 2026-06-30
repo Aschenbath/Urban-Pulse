@@ -6,3 +6,4 @@
 - Reframed the repository README as a public project showcase: product overview, screenshots, feature list, architecture flow, local run commands, and verification commands.
 - Kept the Redis Stream MQ seckill flow as the main technical capability: one generated order ID, Lua qualification check + `XADD`, async consumer group, ACK after DB transaction, and pending-list compensation.
 - Polished the public README showcase visuals: refreshed the mobile CSS, replaced category icons with a consistent SVG set, added neutral showcase photos, and added `tools/capture-readme-screenshots.mjs` for reproducible screenshots.
+- Renamed the public positioning to a Dianping-like local life review app while keeping the Redis backend capability as the technical focus.

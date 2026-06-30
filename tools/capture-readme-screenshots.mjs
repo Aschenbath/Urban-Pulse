@@ -261,7 +261,7 @@ async function capture(url, fileName, prepareExpression) {
 
 const homePrepare = `
 (async () => {
-  document.title = 'Review System';
+  document.title = 'Dianping-like Review App';
   document.querySelectorAll('.el-message').forEach(el => el.remove());
   const city = document.querySelector('.city-btn');
   if (city) city.childNodes[0].nodeValue = 'HZ ';
@@ -272,7 +272,7 @@ const homePrepare = `
 
 const shopPrepare = `
 (async () => {
-  document.title = 'Review System - Shop';
+  document.title = 'Dianping-like Review App - Shop';
   document.querySelectorAll('.el-message').forEach(el => el.remove());
   const set = (selector, text) => {
     const el = document.querySelector(selector);
