@@ -36,7 +36,7 @@ import java.util.concurrent.Executors;
 /**
  * 优惠券秒杀下单服务。
  *
- * 面试主线可以这样讲：
+ * 设计主线：
  * 1. 入口线程只做资格判断和快速返回，不直接落库，避免用户请求被数据库写入拖慢。
  * 2. Redis Lua 脚本负责“库存判断 + 一人一单判断 + 扣 Redis 预库存 + 写 MQ”这一组原子操作。
  * 3. Redis Stream 在这里充当轻量 MQ：生产者是 Lua 的 XADD，消费者是后台线程 XREADGROUP。
@@ -49,7 +49,7 @@ import java.util.concurrent.Executors;
  *
  * 为什么这里先用 Redis Stream 而不是 RabbitMQ：
  * - 项目已经依赖 Redis，Stream 可以在不引入额外中间件的前提下讲清 MQ 核心概念。
- * - Stream 具备消息 ID、消费者组、ACK、pending-list，足够覆盖面试常问的“异步削峰”和“失败补偿”。
+ * - Stream 具备消息 ID、消费者组、ACK、pending-list，足够覆盖“异步削峰”和“失败补偿”的核心场景。
  * - 生产环境如果需要更强的路由、延迟、死信、管理能力，可以再迁移到 RabbitMQ / RocketMQ / Kafka。
  */
 @Slf4j
@@ -196,7 +196,7 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
          * - 下次消费者恢复后，用 ReadOffset.from("0") 读取本消费者组未 ACK 的旧消息。
          * - 重试成功后再 ACK。
          *
-         * 面试重点：MQ 不是“放进去就完事”，要讲清 ACK 和失败补偿，否则异步下单会丢单。
+         * 技术重点：MQ 不是“放进去就完事”，必须处理 ACK 和失败补偿，否则异步下单会丢单。
          */
         private void handlePendingList() {
             while (true) {
@@ -275,7 +275,7 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
      * - 先查订单，避免重复落库。
      * - 扣库存时加 stock > 0 条件，避免极端情况下超卖。
      *
-     * 这是面试里常讲的“双保险”：
+     * 这里采用“双保险”：
      * Redis 负责高并发入口削峰，MySQL 负责最终一致性兜底。
      */
     @Transactional
