@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+  <title>邻客点评</title>
+  <!-- 寮曞叆鏍峰紡 -->
+  <link rel="stylesheet" href="./css/element.css?v=20260317-2145">
+  <link href="./css/main.css?v=20260317-2145" rel="stylesheet">
+  <link href="./css/info.css?v=20260317-2145" rel="stylesheet">
+
+  <style type="text/css">
+      .el-tabs--bottom .el-tabs__item.is-bottom:nth-child(2), .el-tabs--bottom .el-tabs__item.is-top:nth-child(2), .el-tabs--top .el-tabs__item.is-bottom:nth-child(2), .el-tabs--top .el-tabs__item.is-top:nth-child(2) {
+          padding-left: 15px;
+      }
+      .el-tabs, .el-tab-pane{
+          height: 100%;
+      }
+      .el-tabs__header{
+          height: 10%;
+      }
+      .el-tabs__content{
+          height: 90%;
+      }
+  </style>
+
+</head>
+
+<body>
+<div id="app">
+  <div class="header">
+    <div class="header-back-btn" @click="goBack"><i class="el-icon-arrow-left"></i></div>
+    <div class="header-title">&nbsp;&nbsp;&nbsp;</div>
+  </div>
+  <div class="basic">
+    <div class="basic-icon">
+      <img :src="user.icon || '/imgs/icons/default-icon.png'" alt="">
+    </div>
+    <div class="basic-info">
+      <div class="name">{{user.nickName}}</div>
+      <span>鏉窞</span>
+    </div>
+    <div class="logout-btn" @click="followReadonly" style="text-align: center">
+      {{followed ? "鍙栨秷鍏虫敞" : "鍏虫敞"}}
+    </div>
+  </div>
+  <div class="introduce">
+    <span v-if="info.introduce"></span>
+    <span v-else>杩欎釜浜哄緢鎳掞紝浠€涔堥兘娌℃湁鐣欎笅</span>
+  </div>
+  <div class="content">
+    <el-tabs v-model="activeName" @tab-click="handleClick">
+      <el-tab-pane label="绗旇" name="1">
+        <div v-for="b in blogs" :key="b.id" class="blog-item">
+          <div class="blog-img"><img :src="b.images.split(',')[0]" alt=""></div>
+          <div class="blog-info">
+            <div class="blog-title" v-html="b.title"></div>
+            <div class="blog-liked"><img src="/imgs/thumbup.png" alt=""> {{b.liked}}</div>
+            <div class="blog-comments"><i class="el-icon-chat-dot-round"></i> {{b.comments}}</div>
+          </div>
+        </div>
+        <div v-if="!blogs.length" style="padding: 18px 12px; color: #999;">褰撳墠婕旂ず鐗堟殏鏈紑鏀句綔鑰呯瑪璁板垪琛?/div>
+      </el-tab-pane>
+      <el-tab-pane label="鍏卞悓鍏虫敞" name="2">
+        <div>浣犱滑閮藉叧娉ㄤ簡锛?/div>
+        <div class="follow-info" v-for="u in commonFollows" :key="u.id">
+          <div class="follow-info-icon" @click="toOtherInfo(u.id)">
+            <img :src="u.icon || '/imgs/icons/default-icon.png'" alt="">
+          </div>
+          <div class="follow-info-name">
+            <div class="name">{{u.nickName}}</div>
+          </div>
+          <div class="follow-info-btn" @click="toOtherInfo(u.id)">
+              鍘讳富椤电湅鐪?
+          </div>
+        </div>
+      </el-tab-pane>
+    </el-tabs>
+  </div>
+  <foot-bar :active-btn="0"></foot-bar>
+</div>
+<script src="./js/vue.js?v=20260317-2145"></script>
+<script src="./js/axios.min.js?v=20260317-2145"></script>
+<!-- 寮曞叆缁勪欢搴?-->
+<script src="./js/element.js?v=20260317-2145"></script>
+<script src="./js/common.js?v=20260317-2145"></script>
+<script src="./js/footer.js?v=20260317-2145"></script>
+<script>
+  const app = new Vue({
+    el: "#app",
+    data: {
+      util,
+      user: "",
+      loginUser: {},
+      activeName: "1",
+      info: {},
+      blogs: [],
+      followed: false, // 鏄惁鍏虫敞浜?
+      commonFollows: [], // 鍏卞悓鍏虫敞
+    },
+    created() {
+      this.queryUser();
+      this.queryLoginUser();
+    },
+    methods: {
+      queryBlogs() {
+        this.blogs = [];
+      },
+      queryLoginUser() {
+        // 鏌ヨ鐢ㄦ埛淇℃伅
+        axios.get("/user/me")
+          .then(({data}) => {
+            // 淇濆瓨鐢ㄦ埛
+            this.loginUser = data;
+          })
+          .catch(console.log)
+      },
+      queryUser() {
+        // 鏌ヨ鐢ㄦ埛淇℃伅
+        let id = util.getUrlParam("id")
+        const cachedUser = util.getRememberedUserSummary(id)
+        this.user = cachedUser || {id, nickName: "Author", icon: "/imgs/icons/default-icon.png"};
+        this.queryUserInfo();
+        this.queryBlogs();
+        this.isFollowed();
+        axios.get("/user/" + id)
+          .then(({data}) => {
+            // 淇濆瓨鐢ㄦ埛
+            this.user = data;
+            // 鏌ヨ鐢ㄦ埛璇︽儏
+            this.queryUserInfo();
+            // 鏌ヨ鐢ㄦ埛绗旇
+            this.queryBlogs();
+            // 鏄惁琚叧娉?
+            this.isFollowed();
+          })
+          .catch(console.log)
+      },
+      goBack() {
+        history.back();
+      },
+      queryUserInfo(id) {
+        axios.get("/user/info/" + this.user.id)
+          .then(({data}) => {
+            if (!data) {
+              return
+            }
+            // 淇濆瓨鐢ㄦ埛璇︽儏
+            this.info = data;
+            // 淇濆瓨鍒版湰鍦?
+            sessionStorage.setItem("userInfo", JSON.stringify(data))
+          })
+          .catch(err => {
+            this.$message.error(err);
+          })
+      },
+      isFollowed(){
+        this.followed = false;
+        return;
+        axios.get("/follow/or/not/" + this.user.id)
+          .then(({data}) => this.followed = data)
+          .catch(this.$message.error)
+      },
+      queryCommonFollow() {
+        this.commonFollows = [];
+        return;
+        axios.get("/follow/common/" + this.user.id)
+          .then(({data}) => this.commonFollows = data)
+          .catch(err => {
+            this.$message.error(err);
+          })
+      },
+      followReadonly() {
+        util.notifyFeatureUnavailable(this, "Feature unavailable in demo");
+      },
+      follow() {
+        axios.put("/follow/" + this.user.id + "/" + !this.followed)
+          .then(() => {
+            this.$message.success(this.followed ? "宸插彇娑堝叧娉? : "宸插叧娉?)
+            this.followed = !this.followed
+          })
+          .catch(this.$message.error)
+      },
+      handleClick(t) {
+        if (t.name === '2') {
+          this.queryCommonFollow();
+        }
+      },
+      toOtherInfo(id){
+        location.href = "/other-info.html?id=" + id
+      }
+    },
+
+  })
+</script>
+</body>
+
+</html>

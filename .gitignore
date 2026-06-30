@@ -6,6 +6,9 @@ uploads/
 .env
 .env.*
 !.env.example
+nginx-1.18.0/logs/
+nginx-1.18.0/temp/
+nginx-1.18.0/nginx.exe
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
