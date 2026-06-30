@@ -5,7 +5,7 @@
  Source Server Type    : MySQL
  Source Server Version : 50622
  Source Host           : localhost:3306
- Source Schema         : redis_practice
+ Source Schema         : review_platform
 
  Target Server Type    : MySQL
  Target Server Version : 50622

@@ -12,10 +12,10 @@
     </parent>
 
     <groupId>com.aschen.redis</groupId>
-    <artifactId>redis-practice</artifactId>
+    <artifactId>review-redis-backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>redis-practice</name>
-    <description>Spring Boot Redis practice backend</description>
+    <name>review-redis-backend</name>
+    <description>Local life review backend with Redis cache and seckill order flow</description>
 
     <properties>
         <java.version>17</java.version>
