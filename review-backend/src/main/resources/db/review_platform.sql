@@ -158,16 +158,16 @@ CREATE TABLE `tb_shop_type`  (
 -- ----------------------------
 -- Records of tb_shop_type
 -- ----------------------------
-INSERT INTO `tb_shop_type` VALUES (1, '美食', '/types/ms.png', 1, '2021-12-22 20:17:47', '2021-12-23 11:24:31');
-INSERT INTO `tb_shop_type` VALUES (2, 'KTV', '/types/KTV.png', 2, '2021-12-22 20:18:27', '2021-12-23 11:24:31');
-INSERT INTO `tb_shop_type` VALUES (3, '丽人·美发', '/types/lrmf.png', 3, '2021-12-22 20:18:48', '2021-12-23 11:24:31');
-INSERT INTO `tb_shop_type` VALUES (4, '健身运动', '/types/jsyd.png', 10, '2021-12-22 20:19:04', '2021-12-23 11:24:31');
-INSERT INTO `tb_shop_type` VALUES (5, '按摩·足疗', '/types/amzl.png', 5, '2021-12-22 20:19:27', '2021-12-23 11:24:31');
-INSERT INTO `tb_shop_type` VALUES (6, '美容SPA', '/types/spa.png', 6, '2021-12-22 20:19:35', '2021-12-23 11:24:31');
-INSERT INTO `tb_shop_type` VALUES (7, '亲子游乐', '/types/qzyl.png', 7, '2021-12-22 20:19:53', '2021-12-23 11:24:31');
-INSERT INTO `tb_shop_type` VALUES (8, '酒吧', '/types/jiuba.png', 8, '2021-12-22 20:20:02', '2021-12-23 11:24:31');
-INSERT INTO `tb_shop_type` VALUES (9, '轰趴馆', '/types/hpg.png', 9, '2021-12-22 20:20:08', '2021-12-23 11:24:31');
-INSERT INTO `tb_shop_type` VALUES (10, '美睫·美甲', '/types/mjmj.png', 4, '2021-12-22 20:21:46', '2021-12-23 11:24:31');
+INSERT INTO `tb_shop_type` VALUES (1, 'Food', '/types/food.svg', 1, '2021-12-22 20:17:47', '2021-12-23 11:24:31');
+INSERT INTO `tb_shop_type` VALUES (2, 'Cafe', '/types/cafe.svg', 2, '2021-12-22 20:18:27', '2021-12-23 11:24:31');
+INSERT INTO `tb_shop_type` VALUES (3, 'Beauty', '/types/beauty.svg', 3, '2021-12-22 20:18:48', '2021-12-23 11:24:31');
+INSERT INTO `tb_shop_type` VALUES (4, 'Fitness', '/types/fitness.svg', 10, '2021-12-22 20:19:04', '2021-12-23 11:24:31');
+INSERT INTO `tb_shop_type` VALUES (5, 'Massage', '/types/massage.svg', 5, '2021-12-22 20:19:27', '2021-12-23 11:24:31');
+INSERT INTO `tb_shop_type` VALUES (6, 'KTV', '/types/ktv.svg', 6, '2021-12-22 20:19:35', '2021-12-23 11:24:31');
+INSERT INTO `tb_shop_type` VALUES (7, 'Family', '/types/family.svg', 7, '2021-12-22 20:19:53', '2021-12-23 11:24:31');
+INSERT INTO `tb_shop_type` VALUES (8, 'Bar', '/types/bar.svg', 8, '2021-12-22 20:20:02', '2021-12-23 11:24:31');
+INSERT INTO `tb_shop_type` VALUES (9, 'Party', '/types/party.svg', 9, '2021-12-22 20:20:08', '2021-12-23 11:24:31');
+INSERT INTO `tb_shop_type` VALUES (10, 'Nails', '/types/nails.svg', 4, '2021-12-22 20:21:46', '2021-12-23 11:24:31');
 
 -- ----------------------------
 -- Table structure for tb_sign

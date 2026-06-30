@@ -1,92 +1,189 @@
-/*搜索框*/
-.search-bar{
-    background-color: #ff6633;
-    color: white;
-    display: flex;
-    justify-content: space-around;
-    height: 7%;
-    align-items: center;
-    padding: 0 8px;
-}
-.header-icon{
-    /*width: 2%;*/
-    font-size: 14px;
-}
-.search-input{
-    width: 70%;
-}
-.type-list {
-    height: 25%;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-}
-.type-box{
-    width: 17%;
-    text-align: center;
-}
-.type-box img {
-    width: 100%;
-}
-.type-text{
-    color: #111;
-    font-size: 10px;
-    margin-top: -8px;
-    margin-bottom: 10px;
+#app {
+    min-height: 100vh;
+    padding-bottom: 82px;
 }
 
-/*达人探店列表*/
-.blog-list {
-    background-color: #eee;
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    height: 60%;
-    overflow-y: auto;
+.search-bar {
+    min-height: 118px;
+    padding: 26px 18px 20px;
+    color: var(--surface-strong);
+    display: grid;
+    grid-template-columns: 54px 1fr 34px;
+    gap: 12px;
+    align-items: start;
+    background:
+        linear-gradient(135deg, rgba(31, 91, 69, 0.98), rgba(32, 72, 86, 0.94)),
+        url("../imgs/showcase/restaurant.jpg") center/cover;
+    position: relative;
 }
-.blog-box{
-    width: 48%;
-    background-color: #fff;
-    margin: 5px 0;
-    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-    border-radius: 3px;
+
+.search-bar::after {
+    content: "Near you";
+    position: absolute;
+    left: 18px;
+    bottom: 16px;
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    opacity: 0.72;
 }
-.blog-img img{
-    width: 100%;
-    border-radius: 3px;
-}
-.blog-title {
-    padding: 2px 10px;
+
+.city-btn {
     height: 36px;
-    width: 92%;
-    overflow: hidden;
-}
-.blog-foot {
     display: flex;
-    justify-content: space-between;
-    margin: 10px 0 5px 0;
-    padding: 0 10px;
+    align-items: center;
+    font-size: 15px;
+    font-weight: 700;
 }
-.blog-user-icon {
-    width: 10%;
-    margin-right: 3px;
+
+.header-icon {
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 16px;
 }
-.blog-user-name {
-    width: 65%;
-    overflow: hidden;
-}
-.blog-user-icon img{
+
+.search-input {
     width: 100%;
 }
+
+.search-input .el-input__inner {
+    height: 38px;
+    border: 0;
+    border-radius: 8px;
+    background: rgba(255, 253, 248, 0.96);
+    color: var(--ink);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+}
+
+.type-list {
+    min-height: 168px;
+    padding: 18px 12px 16px;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px 8px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+}
+
+.type-box {
+    width: auto;
+    text-align: center;
+}
+
+.type-view {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 7px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: #f4eee4;
+}
+
+.type-box img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+}
+
+.type-text {
+    color: var(--ink);
+    font-size: 11px;
+    line-height: 1.2;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.blog-list {
+    width: 100%;
+    min-height: calc(100vh - 356px);
+    padding: 14px 10px 86px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    gap: 12px;
+    background: var(--page);
+    overflow-y: visible;
+}
+
+.blog-box {
+    width: 100%;
+    margin: 0;
+    background: var(--surface-strong);
+    border: 1px solid rgba(31, 91, 69, 0.10);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+.blog-img {
+    aspect-ratio: 1 / 1.08;
+    overflow: hidden;
+    background: #e8e1d7;
+}
+
+.blog-img img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    border-radius: 0;
+}
+
+.blog-title {
+    width: 100%;
+    min-height: 48px;
+    height: auto;
+    padding: 10px 10px 4px;
+    overflow: hidden;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 750;
+    line-height: 1.28;
+}
+
+.blog-foot {
+    display: grid;
+    grid-template-columns: 24px 1fr auto;
+    gap: 7px;
+    align-items: center;
+    margin: 0;
+    padding: 8px 10px 10px;
+}
+
+.blog-user-icon {
+    width: 24px;
+    height: 24px;
+    margin: 0;
+}
+
+.blog-user-icon img {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.blog-user-name {
+    width: auto;
+    color: var(--muted);
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .blog-liked {
-    width: 25%;
+    width: auto;
     display: flex;
     justify-content: flex-end;
-}
-.blog-liked img{
-    width: 30%;
-    height: 75%;
-    margin-right: 2px;
+    align-items: center;
+    gap: 3px;
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 700;
 }

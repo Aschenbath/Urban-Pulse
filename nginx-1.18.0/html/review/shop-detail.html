@@ -3,7 +3,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-  <title>邻客点评</title>
+  <title>Review System</title>
   <!-- 引入样式 -->
   <link rel="stylesheet" href="./css/element.css">
 
@@ -30,12 +30,12 @@
           text-color="#F63"
           show-score
       ></el-rate>
-      <span>{{shop.comments}}条</span>
+      <span>{{shop.comments}} reviews</span>
     </div>
-    <div class="shop-rate-info"> 口味:4.9  环境:4.8  服务:4.7 </div>
+    <div class="shop-rate-info">Taste 4.9  Space 4.8  Service 4.7</div>
     <div class="shop-rank">
       <img src="/imgs/bd.png" width="63" height="20" alt="">
-      <span>拱墅区好评榜第3名</span>
+      <span>Top rated in Tianhe District</span>
       <div><i class="el-icon-arrow-right"></i></div>
     </div>
     <div class="shop-images">
@@ -54,15 +54,15 @@
   <div class="shop-divider"></div>
   <div class="shop-open-time">
     <span><i class="el-icon-watch"></i></span>
-    <div>营业时间</div>
+    <div>Open Hours</div>
     <div>{{shop.openHours}}</div>
-    <span class="line-right">查看详情 <i class="el-icon-arrow-right"></i></span>
+    <span class="line-right">Details <i class="el-icon-arrow-right"></i></span>
   </div>
   <div class="shop-divider"></div>
   <div class="shop-voucher">
     <div>
-      <span class="voucher-icon">券</span>
-      <span style="font-weight: bold;">代金券</span>
+      <span class="voucher-icon">Deal</span>
+      <span style="font-weight: bold;">Coupons</span>
     </div>
     <div class="voucher-box" v-for="v in vouchers" :key="v.id" v-if="!isEnd(v)">
       <div class="voucher-circle">
@@ -73,22 +73,22 @@
       <div class="voucher-left">
         <div class="voucher-title">{{v.title}}</div>
         <div class="voucher-subtitle">{{v.subTitle}}</div>
-        <div class="voucher-price"><div>￥ {{util.formatPrice(v.payValue)}}</div>  <span>{{(v.payValue*10)/v.actualValue}}折</span></div>
+        <div class="voucher-price"><div>$ {{util.formatPrice(v.payValue)}}</div>  <span>{{formatDiscount(v)}} off</span></div>
       </div>
       <div class="voucher-right">
         <div v-if="v.type" class="seckill-box">
-          <div class="voucher-btn" :class="{'disable-btn': isNotBegin(v) || v.stock < 1}" @click="seckill(v)">限时抢购</div>
-          <div class="seckill-stock">剩余 <span>{{v.stock}}</span> 张</div>
+          <div class="voucher-btn" :class="{'disable-btn': isNotBegin(v) || v.stock < 1}" @click="seckill(v)">Flash Sale</div>
+          <div class="seckill-stock">Stock <span>{{v.stock}}</span> left</div>
           <div class="seckill-time">{{formatTime(v)}}</div>
         </div>
-        <div class="voucher-btn" v-else>抢购</div>
+        <div class="voucher-btn" v-else>Buy</div>
       </div>
     </div>
   </div>
   <div class="shop-divider"></div>
   <div class="shop-comments">
     <div class="comments-head">
-      <div>网友评价 <span>（119）</span></div>
+      <div>User Reviews <span>(128)</span></div>
       <div><i class="el-icon-arrow-right"></i></div>
     </div>
     <div class="comment-tags">
@@ -182,10 +182,12 @@
       formatTime(v){
         let b = new Date(v.beginTime);
         let e = new Date(v.endTime);
-        return b.getMonth() + 1 + "月" + b.getDate() + "日 "
-          +  b.getHours() + ":" + this.formatMinutes(b.getMinutes())
-          + " ~ "/*  + e.getMonth() + 1 + "月" + e.getDate() + "日 " */
-          +  e.getHours() + ":" + this.formatMinutes(e.getMinutes());
+        return this.formatMinutes(b.getHours()) + ":" + this.formatMinutes(b.getMinutes())
+          + " ~ " + this.formatMinutes(e.getHours()) + ":" + this.formatMinutes(e.getMinutes());
+      },
+      formatDiscount(v){
+        if (!v || !v.actualValue) return "-";
+        return ((v.payValue * 10) / v.actualValue).toFixed(1);
       },
       formatMinutes(m){
         if(m < 10) m = "0" + m

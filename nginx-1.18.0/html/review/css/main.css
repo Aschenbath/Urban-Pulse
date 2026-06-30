@@ -1,57 +1,94 @@
+:root {
+    --page: #f6f3ee;
+    --surface: #fffdf8;
+    --surface-strong: #ffffff;
+    --ink: #17211b;
+    --muted: #6f7972;
+    --line: #e4ddd2;
+    --accent: #e95f45;
+    --accent-soft: #fff0e8;
+    --green: #1f5b45;
+    --gold: #c08a2c;
+    --shadow: 0 10px 28px rgba(26, 39, 31, 0.10);
+}
+
 html {
-    font-size: 12px;
     width: 100%;
+    font-size: 12px;
+    background: var(--page);
 }
-body{
+
+body {
     margin: 0;
+    color: var(--ink);
+    background:
+        linear-gradient(180deg, rgba(255, 253, 248, 0.98), rgba(246, 243, 238, 0.98));
+    font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
 }
-html,body,#app{
-    height: 100%;
+
+html,
+body,
+#app {
+    min-height: 100%;
 }
+
+* {
+    box-sizing: border-box;
+}
+
 .el-tabs__item {
     font-size: 14px;
-    font-weight: bold;
+    font-weight: 700;
 }
+
 .el-tabs__active-bar {
-    height: 4px;
-    background-image: linear-gradient(to right, #F63, #f5b9a2);
+    height: 3px;
+    background: var(--green);
 }
+
+.el-rate__icon {
+    margin-right: 0;
+}
+
 .foot {
     width: 100%;
-    height: 8%;
+    height: 70px;
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 -1px 2px 1px rgba(0, 0, 0, 0.1);
-    position: absolute;
+    border-top: 1px solid rgba(31, 91, 69, 0.10);
+    background: rgba(255, 253, 248, 0.96);
+    position: fixed;
     bottom: 0;
-}
-.foot .add-btn {
-    width: 38px;
-    height: 38px;
-    box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.1);
-    border-radius: 18px;
-}
-.foot-box{
-    width: 20%;
-    color: #82848a;
-    text-align: center;
-}
-.foot-view {
-    font-size: 26px;
-}
-.foot-text{
-    font-size: 8px;
-    margin-top: -4px;
-}
-.foot-text, .foot-view{
-    text-align: center;
-}
-.active{
-    color: #ff6633;
+    left: 0;
+    z-index: 50;
+    box-shadow: 0 -8px 24px rgba(23, 33, 27, 0.08);
 }
 
-/*element-ui的评价星星间隙*/
-.el-rate__icon {
-    margin-right: 0;
+.foot .add-btn {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 10px 24px rgba(31, 91, 69, 0.25);
+}
+
+.foot-box {
+    width: 20%;
+    color: #8a928b;
+    text-align: center;
+}
+
+.foot-view {
+    font-size: 24px;
+    line-height: 1;
+}
+
+.foot-text {
+    font-size: 10px;
+    margin-top: 5px;
+}
+
+.active {
+    color: var(--green);
 }

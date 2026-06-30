@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Massage">
+  <rect width="64" height="64" rx="14" fill="#EEF5EF"/>
+  <path d="M18 39c4-8 11-12 20-12h8c3 0 5 2 5 5s-2 5-5 5h-8" fill="none" stroke="#1F5B45" stroke-width="3" stroke-linecap="round"/>
+  <path d="M20 45h22c5 0 9-4 9-9" fill="none" stroke="#E56A48" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="23" cy="25" r="5" fill="#FFF9EF" stroke="#1F5B45" stroke-width="3"/>
+</svg>

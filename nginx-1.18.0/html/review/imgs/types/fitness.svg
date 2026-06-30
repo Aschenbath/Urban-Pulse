@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Fitness">
+  <rect width="64" height="64" rx="14" fill="#F8EFE2"/>
+  <path d="M16 32h32" stroke="#1F5B45" stroke-width="3" stroke-linecap="round"/>
+  <path d="M20 25v14M26 22v20M44 22v20M50 25v14" stroke="#1F5B45" stroke-width="3" stroke-linecap="round"/>
+  <path d="M31 32h6" stroke="#E56A48" stroke-width="3" stroke-linecap="round"/>
+</svg>
