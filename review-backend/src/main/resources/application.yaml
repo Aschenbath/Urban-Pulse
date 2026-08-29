@@ -24,6 +24,12 @@ spring:
   main:
     banner-mode: off
 
+urban-pulse:
+  demo:
+    # 无短信通道的演示环境：把生成的验证码随 /user/code 响应返回，前端自动回填输入框。
+    # 生产环境接入真实短信服务商后设为 false。
+    expose-login-code: ${DEMO_EXPOSE_LOGIN_CODE:true}
+
 mybatis-plus:
   type-aliases-package: com.aschen.redis.entity
   global-config:
