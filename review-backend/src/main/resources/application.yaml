@@ -7,6 +7,16 @@ spring:
     username: ${MYSQL_USERNAME:root}
     password: ${MYSQL_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      # HikariCP 默认 connection-timeout 是 30s，那是给通用 Web 请求设的保守值。
+      # 2026-08-30 实测（2 vCPU / MySQL 8.0.46 / buffer pool 128M）：池大小 10，
+      # 并发打到 120（12 倍池大小）仍然零失败，p99 927ms、最坏 1.03s。
+      # 也就是说真实的排队等待是亚秒级，等满 30 秒只会发生在数据库本身卡死时。
+      # 压到 3s 让这种故障快速暴露，而不是让线程静静挂 30 秒。
+      connection-timeout: 3000
+      # 池大小保持默认 10：实测它已能扛住 12 倍并发，而这台机只有 2 vCPU、
+      # buffer pool 128M，盲目加连接数只会加剧上下文切换和内存压力。
+      maximum-pool-size: 10
 
   redis:
     host: ${REDIS_HOST:127.0.0.1}
