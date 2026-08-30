@@ -1,63 +1,73 @@
--- 秒杀资格校验 + MQ 投递脚本。
+-- 秒杀资格校验 + Redis Stream 投递脚本。
 --
--- 技术重点：
--- 1. Redis 执行 Lua 脚本时是单线程串行执行的，脚本里的多条 Redis 命令具备原子性：
---    不会出现“刚判断库存充足，另一个请求马上把库存扣光”的竞态。
--- 2. 这里不直接写 MySQL，而是通过 XADD 写入 Redis Stream，让后台消费者异步落库：
---    入口请求只承接高并发资格判断，数据库写压力由 MQ 削峰。
--- 3. 返回码约定：
---    0 = 资格校验通过，消息已进入 stream.orders；
---    1 = Redis 库存不足；
---    2 = 用户已经买过，违反一人一单。
+-- Redis 执行 Lua 脚本时是单线程串行执行的，所以这里的库存判断、一人一单判断、预扣库存、写入 MQ
+-- 可以作为一个原子业务单元完成，避免高并发下出现“刚判断有库存，马上被其它请求扣光”的竞态。
+--
+-- 这里不直接写 MySQL，而是通过 XADD 写入 Redis Stream，让后台消费者异步落库：
+-- 入口请求只承接高并发资格判断，数据库写压力由 MQ 削峰。
+--
+-- 返回码约定：
+-- 0 = 校验通过，订单消息已写入 stream.orders
+-- 1 = Redis 预库存不足
+-- 2 = 用户已购买过该优惠券
+-- 3 = 库存 key 缺失或值非法，说明这张券没有被正确预热
 
--- 1. 参数列表
--- 1.1. 优惠券 id
+-- 1. 入参
 local voucherId = ARGV[1]
--- 1.2. 用户 id
 local userId = ARGV[2]
 
--- 1.3. 订单 id
--- 订单 id 必须由 Java 入口层提前生成并传进来。
--- 这样接口返回给前端的 id 和 MQ 消费者最终落库的 id 是同一个，避免“返回 id”和“真实订单 id”不一致。
+-- 订单 ID 由 Java 请求线程提前生成并传入。
+-- 这样接口返回给前端的 ID 与后续消费者真正落库的订单 ID 是同一个值。
 local orderId = ARGV[3]
 
--- 2. 数据 key
--- 2.1. Redis 秒杀库存 key
+-- 2. Redis key
 local stockKey = 'seckill:stock:' .. voucherId
--- 2.2. 已下单用户集合 key，用 set 做一人一单判断
 local orderKey = 'seckill:order:' .. voucherId
 
--- 3. 脚本业务
--- 3.1. 判断库存是否充足。
--- 如果库存 key 还没预热，GET 会返回 nil；这里按 0 处理，直接拒绝，避免 tonumber(nil) 抛脚本异常。
-local stock = tonumber(redis.call('get', stockKey) or '0')
-if(stock <= 0) then
-    -- 库存不足，返回 1
+-- 3. 判断库存。
+--
+-- 这里把"没预热"和"真卖光"拆成两个返回码，因为它们是完全不同的两种情况：
+-- 前者是故障（运维漏了预热，或 key 被误删、Redis 从旧 RDB 快照恢复时丢了 key），
+-- 此时 MySQL 里其实还躺着一批可用的券；后者才是正常的业务结果。
+--
+-- 原先两种都返回 1，代价是：运维在日志和监控上看不到自己漏了预热，
+-- 用户也会看到"已抢完"从而永久放弃，而这批人本来在修复后是能买到的。
+--
+-- GET 在 key 不存在时返回 false，一次调用就能区分，不需要额外的 EXISTS 往返。
+local raw = redis.call('get', stockKey)
+if (raw == false) then
+    return 3
+end
+
+-- 值被写坏成非数字时 tonumber 返回 nil。同样按"未正确预热"处理，
+-- 否则 nil 参与下面的比较会直接抛 Lua 错误，脚本失败又变回一次静默故障。
+local stock = tonumber(raw)
+if (stock == nil) then
+    return 3
+end
+
+if (stock <= 0) then
     return 1
 end
 
--- 3.2. 判断用户是否已经下单。
--- SISMEMBER 是 O(1) 判断；高并发入口先在 Redis 拦住重复请求，减少数据库唯一性查询压力。
+-- 4. 判断一人一单。
+-- 用 set 记录已参与该券秒杀的用户，先在 Redis 入口挡住重复请求，减少数据库唯一性校验压力。
 if(redis.call('sismember', orderKey, userId) == 1) then
-    -- 存在，说明是重复下单，返回 2
     return 2
 end
 
--- 3.3. 扣 Redis 预库存。
--- 注意：这是入口层的“削峰库存”，真正 MySQL 库存仍会在消费者落库时用 stock > 0 再兜底一次。
+-- 5. Redis 预扣库存。
+-- 真正的 MySQL 库存仍会在消费者落库时用 stock > 0 再兜底一次。
 redis.call('incrby', stockKey, -1)
 
--- 3.4. 记录用户已经参与该券秒杀。
--- 这一步必须和扣库存、写 MQ 在同一个 Lua 脚本里，否则中间失败会造成重复下单或库存不一致。
+-- 6. 记录用户已参与。
+-- 这一步必须和预扣库存、写 MQ 在同一个 Lua 脚本里，否则中间失败会造成重复下单或库存不一致。
 redis.call('sadd', orderKey, userId)
 
--- 3.5. 发送订单消息到 Redis Stream。
--- XADD stream.orders * k1 v1 ...:
+-- 7. 写入 Redis Stream，交给后台消费者异步创建订单。
+-- XADD stream.orders * k1 v1 ... 中：
 -- - stream.orders 是队列名；
--- - * 代表 Redis 自动生成全局递增消息 id；
--- - 后面的 userId / voucherId / id 是消费者落库所需的最小字段。
---
--- 这一步成功后，Java 请求线程就可以返回 orderId；
--- 后台消费者通过 XREADGROUP 拉取消息、落库、XACK。
+-- - * 表示 Redis 自动生成递增消息 ID；
+-- - userId / voucherId / id 是消费者落库所需的最小字段。
 redis.call('xadd', 'stream.orders', '*', 'userId', userId, 'voucherId', voucherId, 'id', orderId)
 return 0

@@ -240,6 +240,19 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
         if (code == 2) {
             return Result.fail("不能重复下单");
         }
+        if (code == 3) {
+            /*
+             * 库存 key 缺失或值非法：券在 MySQL 里是有效的，只是 Redis 侧没预热成功。
+             * 这是运维故障而不是业务结果，必须打 error 让它可被发现，
+             * 不能和"已抢完"共用同一条静默的失败路径。
+             *
+             * 用户文案也要和"真卖光"区分：真卖完了应该让用户放弃，
+             * 而这里修复之后他是能买到的，文案要引导他重试而不是劝退。
+             */
+            log.error("秒杀库存未预热或值非法，voucherId={}，请检查 Redis key seckill:stock:{}",
+                    voucherId, voucherId);
+            return Result.fail("活动准备中，请稍后再试");
+        }
         if (code != 0) {
             return Result.fail("秒杀请求处理失败");
         }
