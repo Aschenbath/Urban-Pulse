@@ -64,7 +64,10 @@
       radio: "",
       disabled: false, // 发送短信按钮
       codeBtnMsg: "发送验证码", // 发送短信按钮提示
+      // phone / code 预先声明，保证 Vue 2 能响应式地回填验证码
       form:{
+        phone: "",
+        code: ""
       }
     },
     methods: {
@@ -98,7 +101,11 @@
         }
         // 发送验证码
         axios.post("/user/code?phone="+this.form.phone)
-          .then(() => {
+          .then(({data}) => {
+            // 演示环境没有短信通道，后端把验证码随响应返回，这里直接回填输入框
+            if (data) {
+              this.form.code = String(data);
+            }
             // 禁用按钮
             this.disabled = true;
             // 按钮倒计时

@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.el.parser.Token;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +47,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Autowired
     public StringRedisTemplate stringRedisTemplate;
 
+    /**
+     * 演示开关：本项目没有接入真实短信通道，验证码原本只打印在服务端控制台，
+     * 打开后 /user/code 会把验证码随响应体返回，前端拿到直接回填输入框。
+     * 生产环境接入短信服务商后必须置为 false，否则任何人都能拿到他人验证码。
+     */
+    @Value("${urban-pulse.demo.expose-login-code:false}")
+    private boolean exposeLoginCode;
+
 
     @Override
     public Result sendCode(String phone, HttpSession session) {
@@ -60,9 +69,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         //4.发送验证码
         log.info("发送短信验证码成功，验证码：{}",code);
-        System.out.println("LOGIN_CODE phone=" + phone + " code=" + code);
 
-        return Result.ok();
+        //5.演示环境把验证码回传给前端自动回填；关闭开关后行为退回普通短信登录
+        return exposeLoginCode ? Result.ok(code) : Result.ok();
     }
 
     public User createUserWithPhone(String phone) {

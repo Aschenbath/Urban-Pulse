@@ -7,7 +7,9 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.3</version>
+        <!-- 2.7.x 末版：随附 Spring Framework 5.3.31，其 ASM 才能解析 Java 21（major 65）字节码。
+             停在 2.7.3 时应用启动阶段的组件扫描会直接抛 Unsupported class file major version 65。 -->
+        <version>2.7.18</version>
         <relativePath/>
     </parent>
 
@@ -18,7 +20,14 @@
     <description>Local life review backend with Redis cache and seckill order flow</description>
 
     <properties>
-        <java.version>17</java.version>
+        <!-- Keep Java 21 explicit so compiler and test plugins do not fall back to Maven/JDK defaults. -->
+        <java.version>21</java.version>
+        <maven.compiler.release>21</maven.compiler.release>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
+        <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
+        <lombok.version>1.18.38</lombok.version>
     </properties>
 
     <dependencies>
@@ -67,7 +76,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.38</version>
+            <version>${lombok.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -79,6 +88,29 @@
 
     <build>
         <plugins>
+            <!-- Java 21 compilation is configured here instead of relying only on spring-boot-starter-parent defaults. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
+                <configuration>
+                    <release>${maven.compiler.release}</release>
+                    <!-- JDK 23+ does not reliably discover annotation processors by default; keep Lombok explicit. -->
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <!-- Surefire 3.x handles modern JDK test execution more reliably than the older transitive default. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
