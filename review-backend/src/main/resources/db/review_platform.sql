@@ -1274,7 +1274,11 @@ CREATE TABLE `tb_voucher_order`  (
   `use_time` timestamp NULL DEFAULT NULL COMMENT '核销时间',
   `refund_time` timestamp NULL DEFAULT NULL COMMENT '退款时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`) USING BTREE
+  PRIMARY KEY (`id`) USING BTREE,
+  -- 一人一单的最终防线。Redis 侧的 SISMEMBER 只是入口拦截，多消费者并发落库时
+  -- 应用层的"先查后插"是 check-then-act，并不安全，必须由数据库唯一约束兜底。
+  -- 这个索引同时让幂等判重 / 死信回滚前置确认的查询从全表扫描变成唯一索引等值查找。
+  UNIQUE INDEX `uk_user_voucher`(`user_id`, `voucher_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Compact;
 
 -- ----------------------------
